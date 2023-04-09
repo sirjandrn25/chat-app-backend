@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int         @id @default(autoincrement())
+  email        String      @unique
+  password     String
+  profile      Profile?
+  is_superuser Boolean?    @default(false)
+  is_staff     Boolean?    @default(false)
+  chats        ChatUsers[]
+
+  @@map("users")
+}
+
+model Profile {
+  id         Int       @id @default(autoincrement())
+  first_name String
+  last_name  String
+  gender     String?   @default("M")
+  avatar     String?
+  created_at DateTime? @default(now())
+  user_id    Int       @unique
+  birth_date DateTime?
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("profile")
+}
+
+model Chat {
+  id         Int         @id @default(autoincrement())
+  title      String?
+  is_group   Boolean?    @default(false)
+  created_at DateTime?   @default(now())
+  users      ChatUsers[]
+
+  @@map("chats")
+}
+
+model ChatUsers {
+  user_id  Int
+  user     User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  chat_id  Int
+  chat     Chat      @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+  is_admin Boolean?  @default(false)
+  messages Message[]
+
+  @@id([user_id, chat_id])
+  @@map("chat_users")
+}
+
+model Message {
+  id         Int       @id @default(autoincrement())
+  author_id  Int
+  chat_id    Int
+  chat_user  ChatUsers @relation(fields: [chat_id, author_id], references: [chat_id, user_id], onDelete: Cascade)
+  is_deleted Boolean?  @default(false)
+  created_at DateTime? @default(now())
+  content    String
+
+  @@map("messages")
+}
