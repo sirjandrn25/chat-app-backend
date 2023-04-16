@@ -92,9 +92,11 @@ export const create = async (req: Request | any, res: Response) => {
           is_admin: true,
         };
       }
-      return user;
+
+      return { user_id: user?.user_id?.user_id };
     });
   }
+  console.log({ users: data["users"] });
 
   try {
     const jsonRes = await ChatService.create(data);

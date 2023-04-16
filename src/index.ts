@@ -63,8 +63,10 @@ const cor_options = {
   origin: (origin: string, callback: any = () => {}) => {
     if (white_list.includes(origin) || !origin) {
       callback(null, true);
+      return;
     } else {
       callback(new Error("Not Allowed by cors"));
+      return;
     }
   },
 };
